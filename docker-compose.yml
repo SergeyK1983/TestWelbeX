@@ -8,9 +8,9 @@ services:
     env_file:
       - ./webapi/.env
     environment:
-      - POSTGRES_PASSWORD=root #$${PASSWORD}
-      - POSTGRES_USER=root #$${USER}
-      - POSTGRES_DB=pgdb #$${NAME}
+      - POSTGRES_PASSWORD=$${PASSWORD}
+      - POSTGRES_USER=$${USER}
+      - POSTGRES_DB=$${NAME}
     volumes:
       - ./pgdb:/var/lib/postgresql/data
     ports:
