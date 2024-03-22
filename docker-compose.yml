@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:
+  pgdb:
+    container_name: pgdb
+    image: postgres:15.4-alpine
+    restart: always
+    env_file:
+      - ./webapi/.env
+    environment:
+      - POSTGRES_PASSWORD=root #$${PASSWORD}
+      - POSTGRES_USER=root #$${USER}
+      - POSTGRES_DB=pgdb #$${NAME}
+    volumes:
+      - ./pgdb:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
