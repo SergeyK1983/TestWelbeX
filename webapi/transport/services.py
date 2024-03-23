@@ -22,8 +22,14 @@ def validate_zip(value):
 def validate_number(value):
     """ Валидация поля number модели Car """
 
+    if len(value) < 5:
+        raise ValidationError(
+            _(f"{value} должно быть пять символов"),
+            params={"value": value},
+        )
+
     letter = re.compile(r"^[a-zA-Z]$")
-    if letter.search(value[-1]):
+    if not letter.search(value[-1]):
         raise ValidationError(
             _(f"{value} должна быть буква английского алфавита"),
             params={"value": value},
