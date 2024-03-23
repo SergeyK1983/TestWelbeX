@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -19,7 +21,7 @@ class Car(models.Model):
         ordering = ["id", "cur_location"]
 
     def save(self, *args, **kwargs):
-        self.number[-1].upper()
+        self.number = self.number.upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -61,6 +63,11 @@ class Cargo(models.Model):
         verbose_name = "Груз"
         verbose_name_plural = "Грузы"
         ordering = ["id", "loc_pick_up", "loc_delivery"]
+
+    def clean_location(self):
+        if self.loc_pick_up == self.loc_delivery:
+            raise ValidationError(_(f"пункт отправления {self.loc_pick_up} совпадает с пунктом назначения "
+                                  f"{self.loc_delivery}"))
 
     def __str__(self):
         return f"{self.id}: {self.loc_pick_up} to {self.loc_delivery}"
