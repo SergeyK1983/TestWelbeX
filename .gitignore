@@ -1,6 +1,7 @@
 .idea
 /temp
 /pgdb
+/webapi/locations_data/
 
 /webapi/.env
 
