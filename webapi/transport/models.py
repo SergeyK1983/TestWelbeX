@@ -9,11 +9,12 @@ from .services import validate_zip, validate_number
 class Car(models.Model):
     """ Машина для перевозок """
 
-    number = models.CharField(validators=[validate_number], max_length=5, unique=True, verbose_name="Машина")
+    number = models.CharField(validators=[validate_number], max_length=5, unique=True, verbose_name="Машина",
+                              help_text="Например: 7952D или 5621a")
     cur_location = models.ForeignKey(to='Location', to_field="zip", related_name="cars", on_delete=models.CASCADE,
                                      verbose_name="Текущая локация")
     capacity = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(1000)],
-                                   verbose_name="Грузоподъемность")
+                                   verbose_name="Грузоподъемность", help_text="от 1 до 1000")
 
     class Meta:
         verbose_name = "Машина"
