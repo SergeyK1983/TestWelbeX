@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         list_zips = import_location()
-        list_keys = ["zip", "lat", "long", "city", "state"]
+        list_keys = ("zip", "lat", "long", "city", "state")
         location_list = [Location(**dict(zip(list_keys, zips))) for zips in list_zips]
 
         try:
