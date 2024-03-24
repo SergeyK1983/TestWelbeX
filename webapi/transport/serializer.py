@@ -113,3 +113,32 @@ class CargoCreateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class CargoUpdateSerializer(serializers.ModelSerializer):
+    """ Редактирование груза """
+
+    class Meta:
+        model = Cargo
+        fields = ["weight", "description"]
+
+    def update(self, instance, validated_data):
+        instance.weight = validated_data.get('weight', instance.weight)
+        instance.description = validated_data.get('description', instance.description)
+        instance.save()
+        return instance
+
+
+class CargoListSerializer(serializers.ModelSerializer):
+    """ Информация о грузах """
+
+    class Meta:
+        model = Cargo
+        fields = ["loc_pick_up", "loc_delivery"]
+
+
+class CargoSerializer(serializers.ModelSerializer):
+    """ Информация о грузе """
+
+    class Meta:
+        model = Cargo
+        fields = ["loc_pick_up", "loc_delivery", "weight", "description"]
+

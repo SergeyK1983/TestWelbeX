@@ -62,8 +62,9 @@ class Cargo(models.Model):
     loc_delivery = models.ForeignKey(to=Location, to_field="zip", related_name="delivery", on_delete=models.CASCADE,
                                      verbose_name="Назначение")
     weight = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(1000)], verbose_name="Вес",
-                                 help_text="от 1 до 1000")
-    description = models.TextField(max_length=2000, verbose_name="Описание", help_text="не более 2000 знаков")
+                                 default=100, help_text="от 1 до 1000")
+    description = models.TextField(max_length=2000, verbose_name="Описание", default="Описание груза",
+                                   help_text="не более 2000 знаков")
 
     class Meta:
         verbose_name = "Груз"
@@ -72,3 +73,6 @@ class Cargo(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.loc_pick_up} to {self.loc_delivery}"
+
+    def get_absolute_url(self):
+        return reverse(viewname='cargo', kwargs={'id': self.id})

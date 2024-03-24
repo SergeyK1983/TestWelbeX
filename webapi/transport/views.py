@@ -1,13 +1,11 @@
 import logging
-from django.db import IntegrityError
 from rest_framework import generics, status
-from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from .models import Location, Car, Cargo
 from .serializer import LocationSerializer, CarsListSerializer, CarsCreateSerializer, CarsUpdateSerializer, \
-    CargoCreateSerializer
+    CargoCreateSerializer, CargoUpdateSerializer, CargoListSerializer, CargoSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -99,3 +97,71 @@ class CargoCreateAPIView(generics.CreateAPIView):
             return Response({"error": "Ошибка создания груза"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CargoUpdateAPIView(generics.UpdateAPIView):
+    """ Редактирование груза по ID (вес, описание) """
+
+    serializer_class = CargoUpdateSerializer
+
+    def get_queryset(self):
+        queryset = Cargo.objects.filter(id=self.kwargs['id'])
+        return queryset
+
+    def get_object(self):
+        obj = get_object_or_404(Cargo, id=self.kwargs['id'])
+        return obj
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = CargoUpdateSerializer(instance=instance, data=request.data, context={'request': request})
+
+        if not serializer.is_valid():
+            data_err = {'error': serializer.errors, 'status': 'HTTP_400_BAD_REQUEST'}
+            return Response(data_err, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.save()
+        except Exception as e:
+            logger.error(f"Ошибка редактирования груза: {e.args}")
+            return Response({"error": "Ошибка редактирования груза"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CargoDestroyAPIView(generics.DestroyAPIView):
+    """ Удаление груза по ID. """
+
+    serializer_class = CargoUpdateSerializer
+
+    def get_object(self):
+        obj = get_object_or_404(Cargo, id=self.kwargs['id'])
+        return obj
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        logger.info(f"Запись о грузе удалена: {instance}")
+        return Response(data={'status': 'Запись о грузе удалена.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class CargoAPIView(generics.ListAPIView):
+    """
+    Получение информации о конкретном грузе по ID (локации pick-up, delivery, вес, описание,
+    список номеров ВСЕХ машин с расстоянием до выбранного груза);
+    """
+    serializer_class = CargoSerializer
+
+    def get_queryset(self):
+        queryset = Cargo.objects.filter(id=self.kwargs['id'])
+        return queryset
+
+
+class CargoListAPIView(generics.ListAPIView):
+    """
+    Получение списка грузов (локации pick-up, delivery, количество ближайших машин до груза (=< 450 миль));
+    """
+    serializer_class = CargoListSerializer
+    queryset = Cargo.objects.all()
+
