@@ -25,7 +25,7 @@ class CarListAPIView(generics.ListAPIView):
 
 
 class CarCreateAPIView(generics.CreateAPIView):
-    """ Создание машины """
+    """ Создание машины. Локация задается случайным образом. """
 
     serializer_class = CarsEditSerializer
 

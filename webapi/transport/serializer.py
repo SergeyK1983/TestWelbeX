@@ -42,10 +42,8 @@ class CarsEditSerializer(serializers.ModelSerializer):
         validated_data.update({"cur_location": self.get_location()})
         try:
             instance = Car.objects.create(**validated_data)
-        except TypeError as e:
-            raise APIException(gettext_lazy(f"Ошибка: TypeError - {e}"), )
-        except ValueError as e:
-            raise APIException(gettext_lazy(f"Ошибка: ValueError - {e}"), )
+        except (TypeError, ValueError) as e:
+            raise APIException(gettext_lazy(f"Ошибка: {type(e)} - {e}"), )
         except Exception as e:
             raise APIException(gettext_lazy(f"Ошибка: {e}"), )
         return instance
