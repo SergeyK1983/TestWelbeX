@@ -19,20 +19,23 @@ class Command(BaseCommand):
         example = re.compile(r"^[0-9]{4}[A-Z]$")
         quantity = range(20)
         blank_car = []
-        for i in quantity:
-            d_car = {
-                "number": rstr.xeger(example),
-                "cur_location": random.choice(location),
-                "capacity": random.randint(1, 1000)
-            }
-            blank_car.append(d_car)
+        if location:
+            for i in quantity:
+                d_car = {
+                    "number": rstr.xeger(example),
+                    "cur_location": random.choice(location),
+                    "capacity": random.randint(1, 1000)
+                }
+                blank_car.append(d_car)
 
-        list_car = [Car(**blank_car[i]) for i in quantity]
+            list_car = [Car(**blank_car[i]) for i in quantity]
 
-        try:
-            Car.objects.bulk_create(list_car)
-        except IntegrityError as e:
-            logger.error(f"Во время создания машин возникли ошибки, данные не добавлены: {e}")
+            try:
+                Car.objects.bulk_create(list_car)
+            except IntegrityError as e:
+                logger.error(f"Во время создания машин возникли ошибки, данные не добавлены: {e}")
 
-        logger.info("Создание машин прошло успешно")
+            logger.info("Создание машин прошло успешно")
+        else:
+            logger.error(f"Добавить данные невозможно, список локаций пуст")
 
