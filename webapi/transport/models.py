@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -27,6 +28,9 @@ class Car(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.number} in {self.cur_location}"
+
+    def get_update_url(self):
+        return reverse(viewname="update-car", kwargs={"id": self.id})
 
 
 class Location(models.Model):
