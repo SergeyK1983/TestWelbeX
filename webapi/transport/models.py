@@ -61,18 +61,14 @@ class Cargo(models.Model):
                                     verbose_name="Отправитель")
     loc_delivery = models.ForeignKey(to=Location, to_field="zip", related_name="delivery", on_delete=models.CASCADE,
                                      verbose_name="Назначение")
-    weight = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(1000)], verbose_name="Вес")
-    description = models.TextField(max_length=2000, verbose_name="Описание")
+    weight = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(1000)], verbose_name="Вес",
+                                 help_text="от 1 до 1000")
+    description = models.TextField(max_length=2000, verbose_name="Описание", help_text="не более 2000 знаков")
 
     class Meta:
         verbose_name = "Груз"
         verbose_name_plural = "Грузы"
         ordering = ["id", "loc_pick_up", "loc_delivery"]
-
-    def clean_location(self):
-        if self.loc_pick_up == self.loc_delivery:
-            raise ValidationError(_(f"пункт отправления {self.loc_pick_up} совпадает с пунктом назначения "
-                                  f"{self.loc_delivery}"))
 
     def __str__(self):
         return f"{self.id}: {self.loc_pick_up} to {self.loc_delivery}"

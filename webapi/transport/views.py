@@ -5,8 +5,9 @@ from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from .models import Location, Car
-from .serializer import LocationSerializer, CarsListSerializer, CarsCreateSerializer, CarsUpdateSerializer
+from .models import Location, Car, Cargo
+from .serializer import LocationSerializer, CarsListSerializer, CarsCreateSerializer, CarsUpdateSerializer, \
+    CargoCreateSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -76,3 +77,25 @@ class CarUpdateAPIView(generics.UpdateAPIView):
             return Response({"error": "Ошибка редактирования машины"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CargoCreateAPIView(generics.CreateAPIView):
+    """ Создание нового груза (характеристики локаций pick-up, delivery определяются по введенному zip-коду) """
+
+    serializer_class = CargoCreateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+
+        if not serializer.is_valid():
+            data_err = {'error': serializer.errors, 'status': 'HTTP_400_BAD_REQUEST'}
+            return Response(data_err, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.save()
+        except Exception as e:
+            logger.error(f"Ошибка при создании груза: {e.args}")
+            return Response({"error": "Ошибка создания груза"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
