@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'django_filters',
+    'drf_yasg',
     'rest_framework',
 
     'transport.apps.TransportConfig',
@@ -38,6 +39,12 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+    ],
+
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ],
 
     'DEFAULT_RENDERER_CLASSES': [
