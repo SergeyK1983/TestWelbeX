@@ -34,6 +34,8 @@ class Command(BaseCommand):
                 Car.objects.bulk_create(list_car)
             except IntegrityError as e:
                 logger.error(f"Во время создания машин возникли ошибки, данные не добавлены: {e}")
+            except Exception as e:
+                logger.error(f"Возникла непредвиденная ошибка, данные машин не добавлены: {e}")
 
             logger.info("Создание машин прошло успешно")
         else:

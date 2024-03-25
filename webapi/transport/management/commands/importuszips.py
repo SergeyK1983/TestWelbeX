@@ -21,6 +21,8 @@ class Command(BaseCommand):
             Location.objects.bulk_create(location_list)
         except IntegrityError as e:
             logger.error(f"Во время импорта возникли ошибки, данные не добавлены: {e}")
+        except Exception as e:
+            logger.error(f"Возникла непредвиденная ошибка, данные локаций не добавлены: {e}")
 
         logger.info("Импорт данных прошел успешно")
         list_zips.clear()

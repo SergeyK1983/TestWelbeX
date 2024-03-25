@@ -24,7 +24,8 @@ def import_location():
             line.pop(4)
             list_zips.append(line)
 
-            if var == 1000:
-                break
+            # Оставлено для этапа разработки
+            # if var == 1000:
+            #     break
 
     return list_zips
