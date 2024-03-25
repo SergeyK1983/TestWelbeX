@@ -3,6 +3,8 @@ from geopy import distance
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+# Возможно стоило разделить на два файла.
+
 
 def validate_zip(value):
     """ Валидация поля zip модели Location """
@@ -48,6 +50,7 @@ def get_cargo_all_cars(instance, cars) -> list:
     Список номеров ВСЕХ машин с расстоянием до выбранного груза.
     Используется в CargoSerializer
     """
+    # в distance передавать пару кортежей (lat, lon)
     pick_up = (instance.loc_pick_up.lat, instance.loc_pick_up.long)
 
     # Возможно создание списка geo_cars снижает производительность и стоило использовать один цикл
@@ -67,10 +70,37 @@ def get_cargo_all_cars(instance, cars) -> list:
         dist = round(distance.distance(pick_up, location_car).miles, 2)
         number = car["number"]
         d_car = {
-            "distance": dist,
+            "distance_miles": dist,
             "number": number
         }
         all_cars.append(d_car)
 
     geo_cars.clear()
     return all_cars
+
+
+def get_cargo_nearest_cars(instance, cars) -> int:
+    """
+    Количество ближайших машин до груза (=< 450 миль). Учтена грузоподъемность машины.
+    Используется в CargoListSerializer.
+    """
+    pick_up = (instance.loc_pick_up.lat, instance.loc_pick_up.long)
+
+    geo_cars = []
+    for car in cars:
+        geo_car = {
+            "lat": car.cur_location.lat,
+            "long": car.cur_location.long,
+            "capacity": car.capacity
+        }
+        geo_cars.append(geo_car)
+
+    cars = 0
+    for car in geo_cars:
+        location_car = (car["lat"], car["long"])
+        if round(distance.distance(pick_up, location_car).miles, 2) <= 450:
+            if car["capacity"] > instance.weight:
+                cars += 1
+
+    geo_cars.clear()
+    return cars

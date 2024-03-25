@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
 from .models import Location, Car, Cargo
-from .services import get_cargo_all_cars
+from .services import get_cargo_all_cars, get_cargo_nearest_cars
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -131,9 +131,16 @@ class CargoUpdateSerializer(serializers.ModelSerializer):
 class CargoListSerializer(serializers.ModelSerializer):
     """ Информация о грузах """
 
+    number_cars_not_more_450_miles = serializers.SerializerMethodField('get_cars')
+
     class Meta:
         model = Cargo
-        fields = ["loc_pick_up", "loc_delivery"]
+        fields = ["loc_pick_up", "loc_delivery", "number_cars_not_more_450_miles"]
+
+    def get_cars(self, instance):
+        cars = Car.objects.all()
+        nearest_cars_count = get_cargo_nearest_cars(instance, cars)
+        return nearest_cars_count
 
 
 class CargoSerializer(serializers.ModelSerializer):
