@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
 from .models import Location, Car, Cargo
+from .services import get_cargo_all_cars
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -138,7 +139,16 @@ class CargoListSerializer(serializers.ModelSerializer):
 class CargoSerializer(serializers.ModelSerializer):
     """ Информация о грузе """
 
+    loc_pick_up = LocationSerializer()
+    loc_delivery = LocationSerializer()
+    all_cars = serializers.SerializerMethodField('get_cars')
+
     class Meta:
         model = Cargo
-        fields = ["loc_pick_up", "loc_delivery", "weight", "description"]
+        fields = ["loc_pick_up", "loc_delivery", "weight", "description", "all_cars"]
+
+    def get_cars(self, instance):
+        cars = Car.objects.all()
+        all_cars = get_cargo_all_cars(instance, cars)
+        return all_cars
 
