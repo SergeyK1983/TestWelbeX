@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.8'
 
 services:
   pgdb:
@@ -8,10 +8,34 @@ services:
     env_file:
       - ./webapi/.env
     environment:
-      - POSTGRES_PASSWORD=$${PASSWORD}
-      - POSTGRES_USER=$${USER}
-      - POSTGRES_DB=$${NAME}
+      - ./webapi/.env
     volumes:
-      - ./pgdb:/var/lib/postgresql/data
+      - pgdb:/var/lib/postgresql/data
     ports:
       - "5435:5432"
+
+  webapi:
+    container_name: backend
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: webapi_backend:latest
+#    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+      python manage.py initadmin &&
+      python manage.py importuszips &&
+      python manage.py importcargo &&
+      python manage.py importcars &&
+      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./webapi:/backend
+    env_file:
+      - ./webapi/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+
+volumes:
+  pgdb:

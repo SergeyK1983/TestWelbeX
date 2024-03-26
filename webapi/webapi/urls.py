@@ -8,5 +8,3 @@ urlpatterns = [
 ]
 
 urlpatterns += doc_urls  # swagger
-
-# handler404 = pageNotFound
