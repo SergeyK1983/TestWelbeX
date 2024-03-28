@@ -13,23 +13,6 @@
 
     docker-compose up
 
-Примечание: При первом запуске выдаст ошибки к подключению к БД (вероятней всего). Нужно остановить контейнер. Выполнить docker-compose up  повторно.
-Должны выполниться миграции и заполнение БД начальными данными. 
-
-Перед следующими запусками контейнера нужно в файле docker-compose.yml раскомментировать строку: 
-
-    command: python manage.py runserver 0.0.0.0:8000
-
-Закомментировать строки:
-
-    command: >
-      sh -c "python manage.py migrate &&
-      python manage.py initadmin &&
-      python manage.py importuszips &&
-      python manage.py importcargo &&
-      python manage.py importcars &&
-      python manage.py runserver 0.0.0.0:8000"
-
 ---
 ### Выполнено:
 

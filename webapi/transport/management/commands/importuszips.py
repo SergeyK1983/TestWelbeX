@@ -13,16 +13,19 @@ class Command(BaseCommand):
     help = "Загрузка в БД содержимого из файла uszips.csv в модель Location"
 
     def handle(self, *args, **options):
-        list_zips = import_location()
-        list_keys = ("zip", "lat", "long", "city", "state")
-        location_list = [Location(**dict(zip(list_keys, zips))) for zips in list_zips]
+        if Location.objects.all().count() == 0:
+            list_zips = import_location()
+            list_keys = ("zip", "lat", "long", "city", "state")
+            location_list = [Location(**dict(zip(list_keys, zips))) for zips in list_zips]
 
-        try:
-            Location.objects.bulk_create(location_list)
-        except IntegrityError as e:
-            logger.error(f"Во время импорта возникли ошибки, данные не добавлены: {e}")
-        except Exception as e:
-            logger.error(f"Возникла непредвиденная ошибка, данные локаций не добавлены: {e}")
+            try:
+                Location.objects.bulk_create(location_list)
+            except IntegrityError:
+                logger.error(f"Во время импорта возникли ошибки (IntegrityError), данные не добавлены")
+            except Exception:
+                logger.error(f"Возникла непредвиденная ошибка, данные локаций не добавлены")
 
-        logger.info("Импорт данных прошел успешно")
-        list_zips.clear()
+            logger.info("Импорт данных прошел успешно")
+            list_zips.clear()
+        else:
+            logger.info("БД уже заполнена!")

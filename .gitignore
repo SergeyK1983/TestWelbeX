@@ -1,10 +1,7 @@
 .idea
 /temp
 /pgdb
-/pgdb111
-/webapi/docker
-
-/webapi/start.sh
+/pgdb
 
 /webapi/transport/management/create_car.py
 

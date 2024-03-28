@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   pgdb:
-    container_name: pgdb
+    container_name: pgdb_webapi
     image: postgres:15.4-alpine
     restart: always
     env_file:
@@ -11,31 +11,46 @@ services:
       - ./webapi/.env
     volumes:
       - pgdb:/var/lib/postgresql/data
+#      - ./pgdb:/var/lib/postgresql/data
     ports:
       - "5435:5432"
 
-  webapi:
-    container_name: backend
+  django:
+    container_name: backend_webapi
     build:
       dockerfile: Dockerfile
       context: .
     image: webapi_backend:latest
+#    command: gunicorn dp_docker.wsgi:application --bind 0.0.0.0:8000
 #    command: python manage.py runserver 0.0.0.0:8000
-    command: >
-      sh -c "python manage.py migrate &&
-      python manage.py initadmin &&
-      python manage.py importuszips &&
-      python manage.py importcargo &&
-      python manage.py importcars &&
-      python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./webapi:/backend
+      - static_volume:/var/www/webapi/static
+      - media_volume:/var/www/webapi/media
+#      - ./webapi:/backend
     env_file:
       - ./webapi/.env
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
+#    ports:
+#      - "8000:8000"
     depends_on:
       - pgdb
 
+  nginx:
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/nginx/
+    container_name: nginx_webapi
+    image: nginx-webapi:latest
+    volumes:
+      - static_volume:/var/www/webapi/static
+      - media_volume:/var/www/webapi/media
+    ports:
+      - "8000:80"
+    depends_on:
+      - django
+
 volumes:
+  static_volume:
+  media_volume:
   pgdb:
