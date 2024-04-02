@@ -1,6 +1,5 @@
-from django.core.exceptions import ValidationError
+from geopy import distance
 from django.shortcuts import reverse
-from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -25,6 +24,14 @@ class Car(models.Model):
     def save(self, *args, **kwargs):
         self.number = self.number.upper()
         super().save(*args, **kwargs)
+
+    def get_dist_to_cargo(self, cargo) -> float:
+        if not isinstance(cargo, Cargo):
+            return 0.00
+        pick_up = (cargo.loc_pick_up.lat, cargo.loc_pick_up.long)
+        location_car = (self.cur_location.lat, self.cur_location.long)
+        dist = round(distance.distance(pick_up, location_car).miles, 2)
+        return dist
 
     def __str__(self):
         return f"{self.id}: {self.number} in {self.cur_location}"
@@ -70,6 +77,17 @@ class Cargo(models.Model):
         verbose_name = "Груз"
         verbose_name_plural = "Грузы"
         ordering = ["id", "loc_pick_up", "loc_delivery"]
+
+    def get_nearest_cars(self):
+        pick_up = (self.loc_pick_up.lat, self.loc_pick_up.long)
+        cars = Car.objects.all()
+        list_cars = []
+        for car in cars:
+            location_car = (car.cur_location.lat, car.cur_location.long)
+            if distance.distance(pick_up, location_car).miles <= 450:
+                if car.capacity > self.weight:
+                    list_cars.append(car)
+        return list_cars
 
     def __str__(self):
         return f"{self.id}: {self.loc_pick_up} to {self.loc_delivery}"

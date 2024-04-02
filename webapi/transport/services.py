@@ -104,7 +104,7 @@ def get_cargo_nearest_cars(instance, cars) -> int:
     return cars
 
 
-def get_cars_characteristics(instance, cars):
+def get_cars_characteristics(instance, cars) -> list:
     """ Характеристики ближайших к грузу машин. Используется в CargoListSerializer. """
 
     pick_up = (instance.loc_pick_up.lat, instance.loc_pick_up.long)
@@ -125,5 +125,6 @@ def get_cars_characteristics(instance, cars):
                 }
                 nearest_cars.append(d_car)
 
+    geo_cars.clear()
     return nearest_cars
 

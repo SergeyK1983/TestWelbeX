@@ -1,8 +1,11 @@
 import logging
+
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from .filters import CargoWeightFilter, CarsCapacityFilter
 from .models import Location, Car, Cargo
 from .serializer import LocationSerializer, CarsListSerializer, CarsCreateSerializer, CarsUpdateSerializer, \
     CargoCreateSerializer, CargoUpdateSerializer, CargoListSerializer, CargoSerializer
@@ -22,6 +25,8 @@ class CarListAPIView(generics.ListAPIView):
 
     serializer_class = CarsListSerializer
     queryset = Car.objects.all().order_by("cur_location__zip")
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CarsCapacityFilter
 
 
 class CarCreateAPIView(generics.CreateAPIView):
@@ -164,4 +169,7 @@ class CargoListAPIView(generics.ListAPIView):
     """
     serializer_class = CargoListSerializer
     queryset = Cargo.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CargoWeightFilter
+
 
