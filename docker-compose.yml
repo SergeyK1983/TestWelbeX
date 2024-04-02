@@ -15,6 +15,12 @@ services:
     ports:
       - "5435:5432"
 
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "127.0.0.1:6379:6379"
+
 #  django:
 #    container_name: backend_webapi
 #    build:
