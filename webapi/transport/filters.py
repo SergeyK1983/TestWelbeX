@@ -83,8 +83,8 @@ class DistanceCarsFilter:
     def __init__(self, data: list, request: (dict, None), field: str):
         self.request = request or {}
         self.field = field if isinstance(field, str) else str(field)
-        self.dist_gte = request['dist_gte'] if 'dist_gte' in request else None
-        self.dist_lte = request['dist_lte'] if 'dist_lte' in request else None
+        self.dist_gte = request.get('dist_gte', None)
+        self.dist_lte = request.get('dist_lte', None)
         if self.dist_gte is not None:
             self.dist_gte = int(self.dist_gte) if self.dist_gte.isdigit() else None
         if self.dist_lte is not None:

@@ -8,7 +8,7 @@ load_dotenv(dotenv_path=os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = os.getenv('SECRET_KEY', )
 
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
@@ -151,13 +151,13 @@ else:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redis
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = '6379'
+REDIS_HOST = '127.0.0.1' if DEBUG else os.getenv('REDIS_HOST', '127.0.0.1')
+REDIS_PORT = '6379' if DEBUG else os.getenv('REDIS_PORT', '6379')
 
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/1'  # 'redis://127.0.0.1:6379/1',
     }
 }
 

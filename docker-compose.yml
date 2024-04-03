@@ -10,53 +10,47 @@ services:
     environment:
       - ./webapi/.env
     volumes:
-#      - pgdb:/var/lib/postgresql/data
-      - ./pgdb:/var/lib/postgresql/data
+      - pgdb:/var/lib/postgresql/data
     ports:
       - "5435:5432"
 
   redis:
     image: redis
     container_name: redis
-    ports:
-      - "127.0.0.1:6379:6379"
+    expose:
+      - 6379
 
-#  django:
-#    container_name: backend_webapi
-#    build:
-#      dockerfile: Dockerfile
-#      context: .
-#    image: webapi_backend:latest
-##    command: gunicorn dp_docker.wsgi:application --bind 0.0.0.0:8000
-##    command: python manage.py runserver 0.0.0.0:8000
-#    volumes:
-#      - static_volume:/var/www/webapi/static
-#      - media_volume:/var/www/webapi/media
-##      - ./webapi:/backend
-#    env_file:
-#      - ./webapi/.env
-#    expose:
-#      - 8000
-##    ports:
-##      - "8000:8000"
-#    depends_on:
-#      - pgdb
-#
-#  nginx:
-#    build:
-#      dockerfile: Dockerfile
-#      context: ./docker/nginx/
-#    container_name: nginx_webapi
-#    image: nginx-webapi:latest
-#    volumes:
-#      - static_volume:/var/www/webapi/static
-#      - media_volume:/var/www/webapi/media
-#    ports:
-#      - "8000:80"
-#    depends_on:
-#      - django
-#
-#volumes:
-#  static_volume:
-#  media_volume:
-#  pgdb:
+  django:
+    container_name: backend_webapi
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: webapi_backend:latest
+    volumes:
+      - static_volume:/var/www/webapi/static
+      - media_volume:/var/www/webapi/media
+    env_file:
+      - ./webapi/.env
+    expose:
+      - 8000
+    depends_on:
+      - pgdb
+
+  nginx:
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/nginx/
+    container_name: nginx_webapi
+    image: nginx-webapi:latest
+    volumes:
+      - static_volume:/var/www/webapi/static
+      - media_volume:/var/www/webapi/media
+    ports:
+      - "8000:80"
+    depends_on:
+      - django
+
+volumes:
+  static_volume:
+  media_volume:
+  pgdb:
